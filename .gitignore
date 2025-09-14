@@ -1,0 +1,26 @@
+# Ignorar salidas de compilación
+*.jou
+*.log
+*.str
+*.pb
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.webtalk/
+*.vivado/
+*.vdb
+*.data/
+*.tmp/
+*.sdk/
+*.bit
+*.bin
+*.dcp
+
+# NO ignores estos (fuentes)
+!*.v
+!*.vhd
+!*.xdc
+!*.xpr
+!*.tcl

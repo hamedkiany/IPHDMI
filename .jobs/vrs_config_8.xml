@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Runs Version="1" Minor="0">
+	<Run Id="designIP_rgb2dvi_0_0_synth_1" LaunchDir="C:/IPHDMI/designIP_rgb2dvi_0_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="designIP_clk_wiz_0_0_0_synth_1" LaunchDir="C:/IPHDMI/designIP_clk_wiz_0_0_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="designIP_color_bar_0_0_synth_1" LaunchDir="C:/IPHDMI/designIP_color_bar_0_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Parameters>
+		<Parameter Name="runs.monitorLSFJobs" Val="true" Type="bool"/>
+	</Parameters>
+</Runs>
+

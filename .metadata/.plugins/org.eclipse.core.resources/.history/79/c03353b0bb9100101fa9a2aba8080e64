@@ -1,0 +1,76 @@
+#include "xparameters.h"
+#include "xuartps.h"
+#include "xil_printf.h"
+#include "sleep.h"
+
+#define UART_DEVICE_ID XPAR_XUARTPS_0_DEVICE_ID
+
+XUartPs Uart_Ps;
+
+void show_menu() {
+    xil_printf("\r\n=== Menú de Control HDMI ===\r\n");
+    usleep(20000); // 20 ms
+    xil_printf("1: Cambiar a patrón de color ROJO\r\n");
+    usleep(20000);
+    xil_printf("2: Cambiar a patrón de color VERDE\r\n");
+    usleep(20000);
+    xil_printf("3: Cambiar a patrón de color AZUL\r\n");
+    usleep(20000);
+    xil_printf("4: Cambiar a patrón AMARILLO\r\n");
+    usleep(20000);
+    xil_printf("5: Cambiar color manual (hex)\r\n");
+    usleep(20000);
+    xil_printf("r: Resetear a patrón inicial\r\n");
+    usleep(20000);
+    xil_printf("=============================\r\n");
+    usleep(20000);
+    xil_printf("Seleccione una opción: ");
+}
+
+int main() {
+    XUartPs_Config *Config;
+    u8 ch;
+
+    // Inicializar UART
+    Config = XUartPs_LookupConfig(UART_DEVICE_ID);
+    XUartPs_CfgInitialize(&Uart_Ps, Config, Config->BaseAddress);
+    XUartPs_SetBaudRate(&Uart_Ps, 57600);  // Tu velocidad actual
+
+    // Mostramos el menú una vez al inicio
+    show_menu();
+
+    while (1) {
+        // Espera bloqueante hasta recibir una tecla
+        ch = XUartPs_RecvByte(Uart_Ps.Config.BaseAddress);
+
+        switch (ch) {
+            case '1':
+                xil_printf("\r\nPatrón: ROJO\r\n");
+                break;
+            case '2':
+                xil_printf("\r\nPatrón: VERDE\r\n");
+                break;
+            case '3':
+                xil_printf("\r\nPatrón: AZUL\r\n");
+                break;
+            case '4':
+                xil_printf("\r\nPatrón: AMARILLO\r\n");
+                break;
+            case '5':
+                xil_printf("\r\nColor manual: 0x3366FF\r\n");
+                break;
+            case 'r':
+                xil_printf("\r\nSistema reiniciado\r\n");
+                break;
+            default:
+                xil_printf("\r\nOpción no válida\r\n");
+                break;
+        }
+
+        // Esperar un poco antes de mostrar el menú de nuevo
+        usleep(100000);  // 100 ms
+        show_menu();     // volver a mostrar menú después de cada acción
+    }
+
+    return 0;
+}

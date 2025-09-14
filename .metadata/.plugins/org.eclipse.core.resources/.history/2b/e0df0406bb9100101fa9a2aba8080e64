@@ -1,0 +1,38 @@
+#include "xuartps.h"
+
+#define UART_DEVICE_ID XPAR_XUARTPS_0_DEVICE_ID
+
+XUartPs Uart_Ps;
+
+int main() {
+    XUartPs_Config *Config;
+    int status;
+    u32 mode_reg;
+
+    Config = XUartPs_LookupConfig(UART_DEVICE_ID);
+    status = XUartPs_CfgInitialize(&Uart_Ps, Config, Config->BaseAddress);
+    if (status != XST_SUCCESS) return -1;
+
+    XUartPs_SetBaudRate(&Uart_Ps, 115200);
+
+    // === PARIDAD PAR (EVEN PARITY) ===
+    mode_reg = XUartPs_ReadReg(Uart_Ps.Config.BaseAddress, XUARTPS_MODE_REG_OFFSET);
+    mode_reg &= ~(XUARTPS_MODE_PAR_MASK);         // Limpiar bits de paridad
+    mode_reg |= XUARTPS_MODE_PAR_EVEN;            // Configurar paridad par
+    XUartPs_WriteReg(Uart_Ps.Config.BaseAddress, XUARTPS_MODE_REG_OFFSET, mode_reg);
+
+    // === CONTROL DE FLUJO HARDWARE RTS/CTS ===
+    u32 control_reg = XUartPs_ReadReg(Uart_Ps.Config.BaseAddress, XUARTPS_MODEMCR_OFFSET);
+    control_reg |= XUARTPS_MODEMCR_RTSEN | XUARTPS_MODEMCR_CTSEN;
+    XUartPs_WriteReg(Uart_Ps.Config.BaseAddress, XUARTPS_MODEMCR_OFFSET, control_reg);
+
+    xil_printf("UART configurado con paridad par y RTS/CTS habilitado\r\n");
+
+    // Ejemplo: eco
+    while (1) {
+        u8 ch = XUartPs_RecvByte(Uart_Ps.Config.BaseAddress);
+        XUartPs_SendByte(Uart_Ps.Config.BaseAddress, ch);
+    }
+
+    return 0;
+}
