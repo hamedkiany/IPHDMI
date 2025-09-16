@@ -1,7 +1,7 @@
 --Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
---Date        : Sun Sep 14 20:55:00 2025
+--Date        : Tue Sep 16 02:05:03 2025
 --Host        : ThinkPadX1 running 64-bit major release  (build 9200)
 --Command     : generate_target designIP_wrapper.bd
 --Design      : designIP_wrapper
@@ -50,12 +50,6 @@ architecture STRUCTURE of designIP_wrapper is
     TMDS_CLK_n : out STD_LOGIC;
     TMDS_DATA_p : out STD_LOGIC_VECTOR ( 2 downto 0 );
     TMDS_DATA_n : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    FIXED_IO_0_mio : inout STD_LOGIC_VECTOR ( 53 downto 0 );
-    FIXED_IO_0_ddr_vrn : inout STD_LOGIC;
-    FIXED_IO_0_ddr_vrp : inout STD_LOGIC;
-    FIXED_IO_0_ps_srstb : inout STD_LOGIC;
-    FIXED_IO_0_ps_clk : inout STD_LOGIC;
-    FIXED_IO_0_ps_porb : inout STD_LOGIC;
     DDR_0_cas_n : inout STD_LOGIC;
     DDR_0_cke : inout STD_LOGIC;
     DDR_0_ck_n : inout STD_LOGIC;
@@ -70,7 +64,13 @@ architecture STRUCTURE of designIP_wrapper is
     DDR_0_dm : inout STD_LOGIC_VECTOR ( 3 downto 0 );
     DDR_0_dq : inout STD_LOGIC_VECTOR ( 31 downto 0 );
     DDR_0_dqs_n : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-    DDR_0_dqs_p : inout STD_LOGIC_VECTOR ( 3 downto 0 )
+    DDR_0_dqs_p : inout STD_LOGIC_VECTOR ( 3 downto 0 );
+    FIXED_IO_0_mio : inout STD_LOGIC_VECTOR ( 53 downto 0 );
+    FIXED_IO_0_ddr_vrn : inout STD_LOGIC;
+    FIXED_IO_0_ddr_vrp : inout STD_LOGIC;
+    FIXED_IO_0_ps_srstb : inout STD_LOGIC;
+    FIXED_IO_0_ps_clk : inout STD_LOGIC;
+    FIXED_IO_0_ps_porb : inout STD_LOGIC
   );
   end component designIP;
 begin

@@ -57,6 +57,7 @@ ENTITY designIP_color_bar_0_0 IS
   PORT (
     clk : IN STD_LOGIC;
     rst : IN STD_LOGIC;
+    controlC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     hs : OUT STD_LOGIC;
     vs : OUT STD_LOGIC;
     de : OUT STD_LOGIC;
@@ -111,6 +112,7 @@ ARCHITECTURE designIP_color_bar_0_0_arch OF designIP_color_bar_0_0 IS
     PORT (
       clk : IN STD_LOGIC;
       rst : IN STD_LOGIC;
+      controlC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
       hs : OUT STD_LOGIC;
       vs : OUT STD_LOGIC;
       de : OUT STD_LOGIC;
@@ -177,6 +179,7 @@ BEGIN
     PORT MAP (
       clk => clk,
       rst => rst,
+      controlC => controlC,
       hs => hs,
       vs => vs,
       de => de,

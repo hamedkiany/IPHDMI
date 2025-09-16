@@ -23,6 +23,7 @@
 module color_bar(
 input                 clk,           //pixel clock
 	input                 rst,           //reset signal high active
+	input signed  [31:0]           controlC,
 	output                hs,            //horizontal synchronization
 	output                vs,            //vertical synchronization
 	output                de,            //video valid
@@ -290,7 +291,7 @@ begin
 				rgb_g_reg <= WHITE_G;
 				rgb_b_reg <= WHITE_B;
 			end
-		else if(active_x == (H_ACTIVE/8) * 1)
+		else if(active_x == (H_ACTIVE/8) * controlC)
 			begin
 				rgb_r_reg <= YELLOW_R;
 				rgb_g_reg <= YELLOW_G;

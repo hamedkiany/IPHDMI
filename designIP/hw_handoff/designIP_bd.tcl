@@ -171,6 +171,24 @@ proc create_root_design { parentCell } {
   set TMDS_DATA_p [ create_bd_port -dir O -from 2 -to 0 TMDS_DATA_p ]
   set clk [ create_bd_port -dir I clk ]
 
+  # Create instance: axi_bram_ctrl_0, and set properties
+  set axi_bram_ctrl_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.1 axi_bram_ctrl_0 ]
+  set_property -dict [ list \
+   CONFIG.SINGLE_PORT_BRAM {1} \
+ ] $axi_bram_ctrl_0
+
+  # Create instance: axi_smc, and set properties
+  set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
+  set_property -dict [ list \
+   CONFIG.NUM_SI {1} \
+ ] $axi_smc
+
+  # Create instance: blk_mem_gen_0, and set properties
+  set blk_mem_gen_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 blk_mem_gen_0 ]
+  set_property -dict [ list \
+   CONFIG.EN_SAFETY_CKT {false} \
+ ] $blk_mem_gen_0
+
   # Create instance: clk_wiz_0_0, and set properties
   set block_name clk_wiz_0
   set block_cell_name clk_wiz_0_0
@@ -296,7 +314,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_UIPARAM_DDR_T_RC {48.75} \
    CONFIG.PCW_UIPARAM_DDR_T_RCD {7} \
    CONFIG.PCW_UIPARAM_DDR_T_RP {7} \
-   CONFIG.PCW_USE_M_AXI_GP0 {0} \
+   CONFIG.PCW_USE_M_AXI_GP0 {1} \
  ] $processing_system7_0
 
   # Create instance: rgb2dvi_0, and set properties
@@ -310,6 +328,9 @@ proc create_root_design { parentCell } {
      return 1
    }
   
+  # Create instance: rst_clk_wiz_100M, and set properties
+  set rst_clk_wiz_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_clk_wiz_100M ]
+
   # Create instance: xlconcat_0, and set properties
   set xlconcat_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_0 ]
   set_property -dict [ list \
@@ -326,12 +347,16 @@ proc create_root_design { parentCell } {
  ] $xlconstant_1
 
   # Create interface connections
+  connect_bd_intf_net -intf_net axi_bram_ctrl_0_BRAM_PORTA [get_bd_intf_pins axi_bram_ctrl_0/BRAM_PORTA] [get_bd_intf_pins blk_mem_gen_0/BRAM_PORTA]
+  connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_bram_ctrl_0/S_AXI] [get_bd_intf_pins axi_smc/M00_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR_0] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO_0] [get_bd_intf_pins processing_system7_0/FIXED_IO]
+  connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins processing_system7_0/M_AXI_GP0]
 
   # Create port connections
+  connect_bd_net -net blk_mem_gen_0_douta [get_bd_pins blk_mem_gen_0/douta] [get_bd_pins color_bar_0/controlC]
   connect_bd_net -net clk_in1_0_1 [get_bd_ports clk] [get_bd_pins clk_wiz_0_0/clk_in1]
-  connect_bd_net -net clk_wiz_0_0_clk_out1 [get_bd_pins clk_wiz_0_0/clk_out1] [get_bd_pins color_bar_0/clk] [get_bd_pins rgb2dvi_0/PixelClk]
+  connect_bd_net -net clk_wiz_0_0_clk_out1 [get_bd_pins axi_bram_ctrl_0/s_axi_aclk] [get_bd_pins axi_smc/aclk] [get_bd_pins clk_wiz_0_0/clk_out1] [get_bd_pins color_bar_0/clk] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins rgb2dvi_0/PixelClk] [get_bd_pins rst_clk_wiz_100M/slowest_sync_clk]
   connect_bd_net -net clk_wiz_0_0_clk_out2 [get_bd_pins clk_wiz_0_0/clk_out2] [get_bd_pins rgb2dvi_0/SerialClk]
   connect_bd_net -net color_bar_0_de [get_bd_pins color_bar_0/de] [get_bd_pins rgb2dvi_0/vid_pVDE]
   connect_bd_net -net color_bar_0_hs [get_bd_pins color_bar_0/hs] [get_bd_pins rgb2dvi_0/vid_pHSync]
@@ -343,11 +368,13 @@ proc create_root_design { parentCell } {
   connect_bd_net -net rgb2dvi_0_TMDS_Clk_p [get_bd_ports TMDS_CLK_p] [get_bd_pins rgb2dvi_0/TMDS_Clk_p]
   connect_bd_net -net rgb2dvi_0_TMDS_Data_n [get_bd_ports TMDS_DATA_n] [get_bd_pins rgb2dvi_0/TMDS_Data_n]
   connect_bd_net -net rgb2dvi_0_TMDS_Data_p [get_bd_ports TMDS_DATA_p] [get_bd_pins rgb2dvi_0/TMDS_Data_p]
+  connect_bd_net -net rst_clk_wiz_100M_peripheral_aresetn [get_bd_pins axi_bram_ctrl_0/s_axi_aresetn] [get_bd_pins axi_smc/aresetn] [get_bd_pins rst_clk_wiz_100M/peripheral_aresetn]
   connect_bd_net -net xlconcat_0_dout [get_bd_pins rgb2dvi_0/vid_pData] [get_bd_pins xlconcat_0/dout]
-  connect_bd_net -net xlconstant_0_dout [get_bd_pins rgb2dvi_0/aRst_n] [get_bd_pins xlconstant_0/dout]
+  connect_bd_net -net xlconstant_0_dout [get_bd_pins rgb2dvi_0/aRst_n] [get_bd_pins rst_clk_wiz_100M/dcm_locked] [get_bd_pins rst_clk_wiz_100M/ext_reset_in] [get_bd_pins xlconstant_0/dout]
   connect_bd_net -net xlconstant_1_dout [get_bd_pins color_bar_0/rst] [get_bd_pins rgb2dvi_0/aRst] [get_bd_pins xlconstant_1/dout]
 
   # Create address segments
+  create_bd_addr_seg -range 0x00010000 -offset 0x40000000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_bram_ctrl_0/S_AXI/Mem0] SEG_axi_bram_ctrl_0_Mem0
 
 
   # Restore current instance

@@ -2,8 +2,10 @@
 #include "xuartps.h"
 #include "xil_printf.h"
 #include "sleep.h"
+#include "xil_io.h"
+#include "platform.h"
 
-#define UART_DEVICE_ID XPAR_XUARTPS_0_DEVICE_ID
+//#define UART_DEVICE_ID XPAR_XUARTPS_0_DEVICE_ID
 
 XUartPs Uart_Ps;
 
@@ -29,6 +31,7 @@ void show_menu() {
 
 
 int main() {
+    init_platform();
     XUartPs_Config *Config;
     u8 ch;
 
@@ -49,6 +52,21 @@ int main() {
 
     // Menú inicial
     show_menu();
+    u64 ADRS ;
+    u32 din = 0x00002020;
+    ADRS = XPAR_BRAM_0_BASEADDR ;
+
+    xil_printf("\n\r Hello From Zynq \n\r");
+	Xil_Out32(ADRS, 0xF0F0F0F0);
+    usleep(200000);
+
+    xil_printf("\n\r End of filling the BRAM \n\r");
+    ADRS = XPAR_BRAM_0_BASEADDR ;
+	din = Xil_In32(ADRS);
+    usleep(200000);
+
+	xil_printf("Error at address  0x%08lx  ", din);
+    usleep(200000);
 
     // Bucle principal
     while (1) {
@@ -60,11 +78,16 @@ int main() {
             switch (ch) {
                 case '1':
                 	usleep(200000);
+                	ADRS = XPAR_BRAM_0_BASEADDR ;
+                	Xil_Out32(ADRS, 0x00000010);
                     xil_printf("\r\nPatrón: ROJO\r\n");
                     break;
                 case '2':
                 	usleep(200000);
-                    xil_printf("\r\nPatrón: VERDE\r\n");
+                	ADRS = XPAR_BRAM_0_BASEADDR ;
+                	Xil_Out32(ADRS, 0x00000001);
+
+                	xil_printf("\r\nPatrón: VERDE\r\n");
                     break;
                 case '3':
                 	usleep(200000);
