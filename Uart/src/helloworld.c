@@ -4,29 +4,42 @@
 #include "sleep.h"
 #include "xil_io.h"
 #include "platform.h"
+#include <stdbool.h>
 
 //#define UART_DEVICE_ID XPAR_XUARTPS_0_DEVICE_ID
 
 XUartPs Uart_Ps;
+bool menus;
+
+void uart_flush_rx(void) {
+    u8 dummy;
+    while (XUartPs_IsReceiveData(Uart_Ps.Config.BaseAddress)) {
+        dummy = XUartPs_ReadReg(Uart_Ps.Config.BaseAddress, XUARTPS_FIFO_OFFSET);
+    }
+}
+
 
 void show_menu() {
     xil_printf("\r\n=== Menú de Control HDMI ===\r\n");
     usleep(200000); // 20 ms
-    xil_printf("1: Cambiar a patrón de color ROJO\r\n");
+    xil_printf("1: Color Normal\r\n");
     usleep(200000);
-    xil_printf("2: Cambiar a patrón de color VERDE\r\n");
+    xil_printf("2: Cambiar a todo verde\r\n");
     usleep(200000);
-    xil_printf("3: Cambiar a patrón de color AZUL\r\n");
+    xil_printf("3: Cambiar a todo azul\r\n");
     usleep(200000);
-    xil_printf("4: Cambiar a patrón AMARILLO\r\n");
+    xil_printf("4: Cambiar a todo rojo\r\n");
     usleep(200000);
-    xil_printf("5: Cambiar color manual (hex)\r\n");
-    usleep(200000);
-    xil_printf("6: Menu\r\n");
+    xil_printf("5: Menu\r\n");
     usleep(200000);
     xil_printf("=============================\r\n");
     usleep(200000);
     xil_printf("Seleccione una opción: ");
+    usleep(200000);
+    menus = true;
+    uart_flush_rx();
+    usleep(200000);
+
 }
 
 
@@ -52,21 +65,21 @@ int main() {
 
     // Menú inicial
     show_menu();
+    uart_flush_rx();
+    menus = true;
     u64 ADRS ;
     u32 din = 0x00002020;
     ADRS = XPAR_BRAM_0_BASEADDR ;
 
-    xil_printf("\n\r Hello From Zynq \n\r");
+//    xil_printf("\n\r Hello From Zynq \n\r");
 	Xil_Out32(ADRS, 0xF0F0F0F0);
     usleep(200000);
 
-    xil_printf("\n\r End of filling the BRAM \n\r");
+//    xil_printf("\n\r End of filling the BRAM \n\r");
     ADRS = XPAR_BRAM_0_BASEADDR ;
 	din = Xil_In32(ADRS);
     usleep(200000);
 
-	xil_printf("Error at address  0x%08lx  ", din);
-    usleep(200000);
 
     // Bucle principal
     while (1) {
@@ -74,40 +87,50 @@ int main() {
         ch = XUartPs_RecvByte(Uart_Ps.Config.BaseAddress);
 
         // Filtrar caracteres válidos solamente
-        if (ch == '1' || ch == '2' || ch == '3' || ch == '4' || ch == '5' || ch == '6') {
+        if ((ch == '1' || ch == '2' || ch == '3' || ch == '4' || ch == '5' ) && (menus == false)) {
             switch (ch) {
                 case '1':
                 	usleep(200000);
                 	ADRS = XPAR_BRAM_0_BASEADDR ;
-                	Xil_Out32(ADRS, 0x00000010);
-                    xil_printf("\r\nPatrón: ROJO\r\n");
+                	Xil_Out32(ADRS, 0x00000001);
+                    xil_printf("\r\nPatrón: Color Normal\r\n");
                     break;
                 case '2':
                 	usleep(200000);
                 	ADRS = XPAR_BRAM_0_BASEADDR ;
-                	Xil_Out32(ADRS, 0x00000001);
+                	Xil_Out32(ADRS, 0x00000010);
 
-                	xil_printf("\r\nPatrón: VERDE\r\n");
+                	xil_printf("\r\nPatrón: Cambiar a todo verde\r\n");
                     break;
                 case '3':
                 	usleep(200000);
-                    xil_printf("\r\nPatrón: AZUL\r\n");
+                	ADRS = XPAR_BRAM_0_BASEADDR ;
+                	Xil_Out32(ADRS, 0x00000011);
+
+                	xil_printf("\r\nPatrón: Cambiar a todo azul\r\n");
+
                     break;
                 case '4':
                 	usleep(200000);
-                    xil_printf("\r\nPatrón: AMARILLO\r\n");
+                	ADRS = XPAR_BRAM_0_BASEADDR ;
+                	Xil_Out32(ADRS, 0x00000100);
+
+                	xil_printf("\r\nPatrón: Cambiar a todo rojo\r\n");
+
                     break;
                 case '5':
                 	usleep(200000);
-                    xil_printf("\r\nColor manual: 0x3366FF\r\n");
-                    break;
-                case '6':
-                	usleep(200000);
+//                	ADRS = XPAR_BRAM_0_BASEADDR ;
+//                	Xil_Out32(ADRS, 0x00000010);
+                	uart_flush_rx();
                 	show_menu();
-                    //xil_printf("\r\nSistema reiniciado\r\n");
-                    break;
+                	//xil_printf("\r\nMENU:\r\n");
+
+                	break;
             }
         } else {
+        	ch = XUartPs_RecvByte(Uart_Ps.Config.BaseAddress);
+        	menus = false;
             //xil_printf("\r\nOpción no válida\r\n");
         }
 

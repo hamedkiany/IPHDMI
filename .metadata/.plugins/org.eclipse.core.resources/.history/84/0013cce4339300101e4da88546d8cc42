@@ -1,0 +1,124 @@
+#include "xparameters.h"
+#include "xuartps.h"
+#include "xil_printf.h"
+#include "sleep.h"
+#include "xil_io.h"
+#include "platform.h"
+
+//#define UART_DEVICE_ID XPAR_XUARTPS_0_DEVICE_ID
+
+XUartPs Uart_Ps;
+
+void show_menu() {
+    xil_printf("\r\n=== Menú de Control HDMI ===\r\n");
+    usleep(200000); // 20 ms
+    xil_printf("1: Color Normal\r\n");
+    usleep(200000);
+    xil_printf("2: definir otros colores\r\n");
+    usleep(200000);
+    xil_printf("3: Cambiar a todo verde\r\n");
+    usleep(200000);
+    xil_printf("4: Cambiar a todo azul\r\n");
+    usleep(200000);
+    xil_printf("5: Menu\r\n");
+    usleep(200000);
+    xil_printf("=============================\r\n");
+    usleep(200000);
+    xil_printf("Seleccione una opción: ");
+}
+
+
+int main() {
+    init_platform();
+    XUartPs_Config *Config;
+    u8 ch;
+
+    // Inicializar UART
+    Config = XUartPs_LookupConfig(UART_DEVICE_ID);
+    if (Config == NULL) {
+        xil_printf("Error: no se encontró configuración del UART\r\n");
+        return -1;
+    }
+
+    int Status = XUartPs_CfgInitialize(&Uart_Ps, Config, Config->BaseAddress);
+    if (Status != XST_SUCCESS) {
+        xil_printf("Error al inicializar UART\r\n");
+        return -1;
+    }
+
+    XUartPs_SetBaudRate(&Uart_Ps, 57600); // Velocidad usada en tu terminal
+
+    // Menú inicial
+    show_menu();
+    u64 ADRS ;
+    u32 din = 0x00002020;
+    ADRS = XPAR_BRAM_0_BASEADDR ;
+
+    xil_printf("\n\r Hello From Zynq \n\r");
+	Xil_Out32(ADRS, 0xF0F0F0F0);
+    usleep(200000);
+
+    xil_printf("\n\r End of filling the BRAM \n\r");
+    ADRS = XPAR_BRAM_0_BASEADDR ;
+	din = Xil_In32(ADRS);
+    usleep(200000);
+
+	xil_printf("Error at address  0x%08lx  ", din);
+    usleep(200000);
+
+    // Bucle principal
+    while (1) {
+        // Leer un carácter (bloqueante)
+        ch = XUartPs_RecvByte(Uart_Ps.Config.BaseAddress);
+
+        // Filtrar caracteres válidos solamente
+        if (ch == '1' || ch == '2' || ch == '3' || ch == '4' || ch == '5' ) {
+            switch (ch) {
+                case '1':
+                	usleep(200000);
+                	ADRS = XPAR_BRAM_0_BASEADDR ;
+                	Xil_Out32(ADRS, 0x00000001);
+                    xil_printf("\r\nPatrón: Color Normal\r\n");
+                    break;
+                case '2':
+                	usleep(200000);
+                	ADRS = XPAR_BRAM_0_BASEADDR ;
+                	Xil_Out32(ADRS, 0x00000010);
+
+                	xil_printf("\r\nPatrón: definir otros colores\r\n");
+                    break;
+                case '3':
+                	usleep(200000);
+                	ADRS = XPAR_BRAM_0_BASEADDR ;
+                	Xil_Out32(ADRS, 0x00000011);
+
+                	xil_printf("\r\nPatrón: Cambiar a todo verde\r\n");
+
+                    break;
+                case '4':
+                	usleep(200000);
+                	ADRS = XPAR_BRAM_0_BASEADDR ;
+                	Xil_Out32(ADRS, 0x00000100);
+
+                	xil_printf("\r\nPatrón: Cambiar a todo azul\r\n");
+
+                    break;
+                case '5':
+                	usleep(200000);
+//                	ADRS = XPAR_BRAM_0_BASEADDR ;
+//                	Xil_Out32(ADRS, 0x00000010);
+                	show_menu();
+                	//xil_printf("\r\nMENU:\r\n");
+
+                	break;
+            }
+        } else {
+            //xil_printf("\r\nOpción no válida\r\n");
+        }
+
+        usleep(100000); // pequeña pausa
+        //show_menu();     // volver a mostrar menú
+    }
+
+    return 0;
+}

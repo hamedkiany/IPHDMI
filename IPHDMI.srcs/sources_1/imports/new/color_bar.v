@@ -285,65 +285,93 @@ begin
 			rgb_b_reg <= 8'h00;
 		end
 	else if(video_active)
-		if(active_x == 12'd0)
-			begin
-				rgb_r_reg <= WHITE_R;
-				rgb_g_reg <= WHITE_G;
-				rgb_b_reg <= WHITE_B;
-			end
-		else if(active_x == (H_ACTIVE/8) * controlC)
-			begin
-				rgb_r_reg <= YELLOW_R;
-				rgb_g_reg <= YELLOW_G;
-				rgb_b_reg <= YELLOW_B;
-			end         
-		else if(active_x == (H_ACTIVE/8) * 2)
-			begin
-				rgb_r_reg <= CYAN_R;
-				rgb_g_reg <= CYAN_G;
-				rgb_b_reg <= CYAN_B;
-			end
-		else if(active_x == (H_ACTIVE/8) * 3)
-			begin
-				rgb_r_reg <= GREEN_R;
-				rgb_g_reg <= GREEN_G;
-				rgb_b_reg <= GREEN_B;
-			end
-		else if(active_x == (H_ACTIVE/8) * 4)
-			begin
-				rgb_r_reg <= MAGENTA_R;
-				rgb_g_reg <= MAGENTA_G;
-				rgb_b_reg <= MAGENTA_B;
-			end
-		else if(active_x == (H_ACTIVE/8) * 5)
-			begin
-				rgb_r_reg <= RED_R;
-				rgb_g_reg <= RED_G;
-				rgb_b_reg <= RED_B;
-			end
-		else if(active_x == (H_ACTIVE/8) * 6)
-			begin
-				rgb_r_reg <= BLUE_R;
-				rgb_g_reg <= BLUE_G;
-				rgb_b_reg <= BLUE_B;
-			end 
-		else if(active_x == (H_ACTIVE/8) * 7)
-			begin
-				rgb_r_reg <= BLACK_R;
-				rgb_g_reg <= BLACK_G;
-				rgb_b_reg <= BLACK_B;
-			end
-		else
-			begin
-				rgb_r_reg <= rgb_r_reg;
-				rgb_g_reg <= rgb_g_reg;
-				rgb_b_reg <= rgb_b_reg;
-			end         
-	else
-		begin
-			rgb_r_reg <= 8'h00;
-			rgb_g_reg <= 8'h00;
-			rgb_b_reg <= 8'h00;
-		end
+        case(controlC)
+            32'h00000001: begin // Patrón 1: colores de barras
+                if(active_x == 12'd0)
+                    begin
+                        rgb_r_reg <= WHITE_R;
+                        rgb_g_reg <= WHITE_G;
+                        rgb_b_reg <= WHITE_B;
+                    end
+                else if(active_x == (H_ACTIVE/8) * 1)
+                    begin
+                        rgb_r_reg <= YELLOW_R;
+                        rgb_g_reg <= YELLOW_G;
+                        rgb_b_reg <= YELLOW_B;
+                    end         
+                else if(active_x == (H_ACTIVE/8) * 2)
+                    begin
+                        rgb_r_reg <= CYAN_R;
+                        rgb_g_reg <= CYAN_G;
+                        rgb_b_reg <= CYAN_B;
+                    end
+                else if(active_x == (H_ACTIVE/8) * 3)
+                    begin
+                        rgb_r_reg <= GREEN_R;
+                        rgb_g_reg <= GREEN_G;
+                        rgb_b_reg <= GREEN_B;
+                    end
+                else if(active_x == (H_ACTIVE/8) * 4)
+                    begin
+                        rgb_r_reg <= MAGENTA_R;
+                        rgb_g_reg <= MAGENTA_G;
+                        rgb_b_reg <= MAGENTA_B;
+                    end
+                else if(active_x == (H_ACTIVE/8) * 5)
+                    begin
+                        rgb_r_reg <= RED_R;
+                        rgb_g_reg <= RED_G;
+                        rgb_b_reg <= RED_B;
+                    end
+                else if(active_x == (H_ACTIVE/8) * 6)
+                    begin
+                        rgb_r_reg <= BLUE_R;
+                        rgb_g_reg <= BLUE_G;
+                        rgb_b_reg <= BLUE_B;
+                    end 
+                else if(active_x == (H_ACTIVE/8) * 7)
+                    begin
+                        rgb_r_reg <= BLACK_R;
+                        rgb_g_reg <= BLACK_G;
+                        rgb_b_reg <= BLACK_B;
+                    end
+            end
+    
+            32'h00000010: begin // Patrón 2: otro set de colores
+                    rgb_r_reg <= 8'hFF;
+                    rgb_g_reg <= 8'h80;
+                    rgb_b_reg <= 8'h00; // ejemplo naranja
+            end
+    
+            32'h00000011: begin // Patrón 3: todo verde
+                    rgb_r_reg <= 8'h00;
+                    rgb_g_reg <= 8'hFF;
+                    rgb_b_reg <= 8'h00;
+             end
+    
+            32'h00000100: begin // Patrón 4: todo azul
+                    rgb_r_reg <= 8'h00;
+                    rgb_g_reg <= 8'h00;
+                    rgb_b_reg <= 8'hFF;
+             end
+    
+            default: begin
+                rgb_r_reg <= 8'h00;
+                rgb_g_reg <= 8'h00;
+                rgb_b_reg <= 8'h00;
+            end
+        endcase
+    //		else
+    //			begin
+    //				rgb_r_reg <= rgb_r_reg;
+    //				rgb_g_reg <= rgb_g_reg;
+    //				rgb_b_reg <= rgb_b_reg;
+    //			end         
+    else
+        begin
+            rgb_r_reg <= 8'h00;
+            rgb_g_reg <= 8'h00;
+            rgb_b_reg <= 8'h00;
+        end
 end
 endmodule
