@@ -1,0 +1,7 @@
+//arch = zynq; split = false; format = BIN
+the_ROM_image:
+{
+	[bootloader]C:\IPHDMI\12\Debug\12.elf
+	C:\IPHDMI\designIP_wrapper_hw_platform_0\designIP_wrapper.bit
+	C:\IPHDMI\Uart\Debug\Uart.elf
+}
